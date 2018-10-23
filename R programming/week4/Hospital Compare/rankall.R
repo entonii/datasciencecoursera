@@ -1,5 +1,5 @@
 rankall <- function(outcome, num) {
-  ## Read outcome data: COLS: HospitalName, State, HeartAttack, HearFailure, Pneumonia
+  ## Read data, cols: HospitalName, State, HeartAttack, HearFailure, Pneumonia
   data <- read.csv("outcome-of-care-measures.csv", colClasses = "character")[,c(2,7,11,17,23)]
   
   ## Check that state and outcome are valid  
@@ -15,9 +15,9 @@ rankall <- function(outcome, num) {
   
   
   ## For each state, find the hospital of the given rank
-  ## Return a data frame with the hospital names and the (abbreviated) state name
+  ## Return a data frame with the hospital names and the state name
   
-  # Remove columns by outcome, only left HospitalName and Deaths by outcome
+  # select the columns HospitalName, State, and outcome
   if(outcome == "heart attack") {
     data = data[,c(1,2,3)]
   } else if(outcome == "heart failure") {
@@ -25,16 +25,16 @@ rankall <- function(outcome, num) {
   } else if(outcome == "pneumonia") {
     data = data[,c(1,2,5)]
   }
-  names(data)[3] = "Deaths"
+  names(data)[3] = "Deathrate"
   data[, 3] = suppressWarnings( as.numeric(data[, 3]) )
   
   # Remove rows with NA
-  data = data[!is.na(data$Deaths),]
+  data = data[!is.na(data$Deathrate),]
   
   splited = split(data, data$State)
   ans = lapply(splited, function(x, num) {
     # Order by Deaths and then HospitalName
-    x = x[order(x$Deaths, x$Hospital.Name),]
+    x = x[order(x$Deathrate, x$Hospital.Name),]
     
     # Return
     if(class(num) == "character") {
