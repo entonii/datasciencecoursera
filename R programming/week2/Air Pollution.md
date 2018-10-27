@@ -31,7 +31,7 @@ pollutantmean <- function(directory, pollutant, id = 1:332) {
 }
 ```
 
-## Mycode - Part 1
+## My code - Part 1
 
 ```
 pollutantmean<-function(directory,pollutant,id=1:332){
@@ -73,6 +73,31 @@ complete <- function(directory, id = 1:332) {
         ## number of complete cases
 }
 ```
+## My code - Part 2
+
+```
+complete <- function(directory,id=1:332){
+  
+  #create a list of files
+  list_files<-list.files(directory,full.names = TRUE)
+  #create an empty data frame
+  dat <- data.frame()
+  
+  for(i in id){
+    #read in the file
+    temp<- read.csv(list_files[i],header=TRUE)
+    #delete rows that do not have complete cases
+    temp<-na.omit(temp)
+    
+    #count all of the rows with complete cases
+    nobs<-nrow(temp)
+    
+    #enumerate the complete cases by index
+    dat<-rbind(dat,data.frame(i,nobs))
+  }
+  return(dat)
+}
+```
 
 # Part 3
 ## Writing a function that takes a directory of data files and a threshold for complete cases and calculates the correlation between sulfate and nitrate for monitor locations where the number of completely observed cases (on all variables) is greater than the threshold. The function should return a vector of correlations for the monitors that meet the threshold requirement. If no monitors meet the threshold requirement, then the function should return a numeric vector of length 0. A prototype of this function follows
@@ -90,5 +115,36 @@ corr <- function(directory, threshold = 0) {
 
         ## Return a numeric vector of correlations
         ## NOTE: Do not round the result!
+}
+```
+
+## My code - Part 3
+
+```
+corr<-function(directory,threshold=0){
+  #create list of file names
+  filesD<-list.files(directory,full.names = TRUE)
+  
+  #create empty vector
+  dat <- vector(mode = "numeric", length = 0)
+  
+  for(i in 1:length(filesD)){
+    #read in file
+    temp<- read.csv(filesD[i],header=TRUE)
+    #delete NAs
+    temp<-temp[complete.cases(temp),]
+    #count the number of observations
+    csum<-nrow(temp)
+    #if the number of rows is greater than the threshold
+    if(csum>threshold){
+      #for that file you find the correlation between nitrate and sulfate
+      #combine each correlation for each file in vector format using the concatenate function 
+      #since this is not a data frame we cannot use rbind or cbind
+      dat<-c(dat,cor(temp$nitrate,temp$sulfate))
+    }
+    
+  }
+  
+  return(dat)
 }
 ```
